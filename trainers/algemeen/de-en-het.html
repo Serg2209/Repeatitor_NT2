@@ -1,1 +1,549 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De of Het — Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue-deep:#0B2D6B;
+    --blue:#1E5FD9;
+    --blue-soft:#EFF4FC;
+    --orange:#F97316;
+    --orange-deep:#C2410C;
+    --orange-soft:#FFF1E6;
+    --text:#101114;
+    --text-muted:#4A4D55;
+    --bg:#FFFFFF;
+    --border:#D9E2F1;
+    --green:#276749;
+    --green-soft:#C6F6D5;
+    --red:#C53030;
+    --red-soft:#FED7D7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--blue-soft);
+    color:var(--text);
+    font-family:'Inter',Arial,sans-serif;
+    font-size:17px;
+    line-height:1.65;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:24px 16px;
+  }
+  h1,h2,h3{
+    font-family:'Poppins',Arial,sans-serif;
+    color:var(--blue-deep);
+    margin:0 0 0.4em;
+  }
+  .container{
+    background:var(--bg);
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(11,45,107,0.12);
+    max-width:760px;
+    width:100%;
+    overflow:hidden;
+  }
+  .topbar{
+    background:var(--blue-deep);
+    padding:26px 24px 20px;
+    color:#fff;
+    text-align:center;
+  }
+  .topbar h1{
+    color:#fff;
+    font-size:26px;
+    margin-bottom:4px;
+  }
+  .topbar p{
+    color:#C9DAF7;
+    margin:0;
+    font-size:15px;
+  }
+  .eyebrow{
+    display:inline-block;
+    background:var(--orange);
+    color:#241000;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:500;
+    font-size:13px;
+    padding:3px 10px;
+    border-radius:5px;
+    margin-bottom:10px;
+    letter-spacing:0.03em;
+  }
+  .stats-bar{
+    display:flex;
+    justify-content:space-around;
+    background:var(--blue-soft);
+    padding:16px 12px;
+    border-bottom:1px solid var(--border);
+  }
+  .stat{ text-align:center; }
+  .stat-value{
+    font-family:'Poppins',Arial,sans-serif;
+    font-size:1.5em;
+    font-weight:700;
+    color:var(--blue-deep);
+  }
+  .stat-label{ color:var(--text-muted); font-size:0.82em; }
+  .streak{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    background:var(--orange-soft);
+    color:var(--orange-deep);
+  }
+  .progress-bar{
+    height:8px;
+    background:var(--border);
+    overflow:hidden;
+    margin:0;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--blue), var(--blue-deep));
+    transition:width 0.3s ease;
+  }
+  .game-area{ padding:32px 28px 36px; }
+  .word-display{ text-align:center; margin-bottom:28px; }
+  .word-card{
+    background:var(--blue-soft);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:32px;
+    display:inline-block;
+    min-width:260px;
+  }
+  .dutch-word{
+    font-family:'Poppins',Arial,sans-serif;
+    font-size:2.4em;
+    font-weight:700;
+    color:var(--blue-deep);
+    margin-bottom:8px;
+  }
+  .translation{ font-size:1.05em; color:var(--text-muted); }
+  .level-badge{
+    display:inline-block;
+    background:var(--orange);
+    color:#241000;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:500;
+    font-size:0.75em;
+    padding:4px 12px;
+    border-radius:20px;
+    margin-top:12px;
+  }
+  .buttons{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    margin-bottom:24px;
+  }
+  .btn{
+    padding:16px 48px;
+    font-family:'Poppins',Arial,sans-serif;
+    font-size:1.5em;
+    font-weight:700;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    transition:all 0.2s ease;
+    text-transform:uppercase;
+    color:#fff;
+  }
+  .btn-de{ background:var(--blue); box-shadow:0 4px 12px rgba(30,95,217,0.35); }
+  .btn-de:hover:not(:disabled){ background:var(--blue-deep); transform:translateY(-2px); }
+  .btn-het{ background:var(--orange); color:#241000; box-shadow:0 4px 12px rgba(249,115,22,0.35); }
+  .btn-het:hover:not(:disabled){ background:var(--orange-deep); color:#fff; transform:translateY(-2px); }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+  .feedback{
+    text-align:center;
+    padding:14px 18px;
+    border-radius:10px;
+    margin-bottom:20px;
+    font-size:1.05em;
+    font-weight:600;
+    display:none;
+  }
+  .feedback.correct{ background:var(--green-soft); color:var(--green); border:1px solid #9AE6B4; }
+  .feedback.incorrect{ background:var(--red-soft); color:var(--red); border:1px solid #FC8181; }
+  .hint-box{
+    background:var(--orange-soft);
+    border-left:4px solid var(--orange);
+    padding:14px 16px;
+    margin-top:18px;
+    border-radius:0 10px 10px 0;
+    display:none;
+    font-size:15px;
+  }
+  .hint-box.show{ display:block; }
+  .controls{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    padding:16px;
+    background:var(--blue-soft);
+    border-top:1px solid var(--border);
+  }
+  .control-btn{
+    padding:10px 22px;
+    border:1px solid var(--blue);
+    background:#fff;
+    color:var(--blue);
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+    transition:all 0.2s;
+  }
+  .control-btn:hover{ background:var(--blue); color:#fff; }
+  .start-screen, .end-screen{ text-align:center; padding:44px 28px; }
+  .start-screen h2, .end-screen h2{ font-size:1.5em; }
+  .level-select{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin:24px 0;
+    flex-wrap:wrap;
+  }
+  .level-btn{
+    padding:10px 20px;
+    border:1px solid var(--border);
+    background:#fff;
+    border-radius:20px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    transition:all 0.2s;
+  }
+  .level-btn:hover, .level-btn.active{
+    border-color:var(--blue);
+    background:var(--blue-soft);
+    color:var(--blue-deep);
+  }
+  .start-btn{
+    background:var(--orange);
+    color:#241000;
+    padding:14px 44px;
+    font-size:1.05em;
+    font-weight:700;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(249,115,22,0.35);
+    transition:all 0.2s;
+  }
+  .start-btn:hover{ background:var(--orange-deep); color:#fff; transform:translateY(-2px); }
+  .hidden{ display:none; }
+  footer{
+    text-align:center;
+    padding:14px;
+    font-size:13px;
+    color:var(--text-muted);
+    background:var(--blue-soft);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <span class="eyebrow">Trainers · algemeen</span>
+    <h1>De of het — quiz</h1>
+    <p>Тест на знання нідерландських артиклів · всі рівні, вибір самостійний</p>
+  </div>
 
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-value" id="score">0</div><div class="stat-label">Бали</div></div>
+    <div class="stat"><div class="stat-value" id="question-num">1</div><div class="stat-label">Питання</div></div>
+    <div class="stat"><div class="stat-value" id="accuracy">0%</div><div class="stat-label">Точність</div></div>
+    <div class="stat"><div class="stat-value streak" id="streak">🔥 <span id="streak-count">0</span></div><div class="stat-label">Серія</div></div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <div class="start-screen" id="start-screen">
+    <h2>Оберіть рівень складності</h2>
+    <div class="level-select">
+      <button class="level-btn active" data-level="all">Всі рівні</button>
+      <button class="level-btn" data-level="1">Рівень 1 (Базовий)</button>
+      <button class="level-btn" data-level="2">Рівень 2 (Середній)</button>
+      <button class="level-btn" data-level="3">Рівень 3 (Складний)</button>
+    </div>
+    <button class="start-btn" onclick="startGame()">Почати гру</button>
+  </div>
+
+  <div class="game-area hidden" id="game-area">
+    <div class="word-display">
+      <div class="word-card">
+        <div class="dutch-word" id="current-word">woord</div>
+        <div class="translation" id="translation">переклад</div>
+        <span class="level-badge" id="level-badge">Рівень 1</span>
+      </div>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="buttons">
+      <button class="btn btn-de" onclick="checkAnswer('de')" id="btn-de">DE</button>
+      <button class="btn btn-het" onclick="checkAnswer('het')" id="btn-het">HET</button>
+    </div>
+    <div class="hint-box" id="hint-box"><strong>Підказка:</strong> <span id="hint-text"></span></div>
+  </div>
+
+  <div class="end-screen hidden" id="end-screen">
+    <h2>🎉 Гру завершено!</h2>
+    <div style="font-family:'Poppins',Arial,sans-serif; font-size:2.4em; color:var(--blue-deep); margin:16px 0; font-weight:700;">
+      <span id="final-score">0</span> / <span id="total-questions">0</span>
+    </div>
+    <p style="font-size:1.05em; color:var(--text-muted); margin-bottom:24px;">Точність: <strong id="final-accuracy">0%</strong></p>
+    <div id="performance-message" style="margin-bottom:24px; font-size:1.05em;"></div>
+    <button class="start-btn" onclick="restartGame()">Грати знову</button>
+  </div>
+
+  <div class="controls" id="controls" style="display:none;">
+    <button class="control-btn" onclick="showHint()">💡 Підказка</button>
+    <button class="control-btn" onclick="skipQuestion()">⏭ Пропустити</button>
+    <button class="control-btn" onclick="endGame()">🏁 Завершити</button>
+  </div>
+
+  <footer>Trainers/algemeen · NT2-programma</footer>
+</div>
+
+<script>
+    const words = [
+        {word: "manier", article: "de", translation: "спосіб, метод", level: 1, hint: "Як і більшість абстрактних понять на -er"},
+        {word: "video", article: "de", translation: "відео", level: 1, hint: "Фемінін (історично вимовлялося як 'vidéo')"},
+        {word: "lijst", article: "de", translation: "список", level: 1, hint: "Слова на -st зазвичай de"},
+        {word: "reden", article: "de", translation: "причина", level: 1, hint: "Абстрактне поняття"},
+        {word: "vraag", article: "de", translation: "питання", level: 1, hint: "Слова на -aag зазвичай de"},
+        {word: "mens", article: "de", translation: "людина", level: 1, hint: "⚠️ Часта помилка: het mens — НЕПРАВИЛЬНО"},
+        {word: "persoon", article: "de", translation: "особа", level: 1, hint: "Особи завжди de"},
+        {word: "taal", article: "de", translation: "мова", level: 1, hint: "Мови — виняток (het Nederlands, але de taal)"},
+        {word: "kennis", article: "de", translation: "знання", level: 1, hint: "Невідмінюване, але артикль de"},
+        {word: "natuur", article: "de", translation: "природа", level: 1, hint: "Слова на -uur зазвичай de (крім часу)"},
+        {word: "muziek", article: "de", translation: "музика", level: 1, hint: "Мистецтво — de"},
+        {word: "wandeling", article: "de", translation: "прогулянка", level: 1, hint: "Слова на -ing завжди de"},
+        {word: "oorzaak", article: "de", translation: "причина", level: 1, hint: "Абстрактне поняття"},
+        {word: "analyse", article: "de", translation: "аналіз", level: 1, hint: "Грецькі слова на -se часто de"},
+        {word: "mening", article: "de", translation: "думка", level: 1, hint: "Слова на -ing завжди de"},
+        {word: "agenda", article: "de", translation: "щоденник", level: 1, hint: "Латинські на -a часто de"},
+        {word: "crisis", article: "de", translation: "криза", level: 1, hint: "Грецькі на -is зазвичай de"},
+        {word: "structuur", article: "de", translation: "структура", level: 1, hint: "⚠️ Виняток: -uur зазвичай het, але це de"},
+        {word: "wetenschap", article: "de", translation: "наука", level: 1, hint: "Слова на -schap зазвичай de"},
+        {word: "bagage", article: "de", translation: "багаж", level: 1, hint: "Французькі на -age часто de"},
+        {word: "factuur", article: "de", translation: "рахунок", level: 1, hint: "Французькі на -uur"},
+        {word: "kind", article: "het", translation: "дитина", level: 1, hint: "⚠️ ВИНЯТОК! Запам'ятай: het kind"},
+        {word: "leven", article: "het", translation: "життя", level: 1, hint: "Слова на -ven"},
+        {word: "antwoord", article: "het", translation: "відповідь", level: 1, hint: "Слова на -woord"},
+        {word: "idee", article: "het", translation: "ідея", level: 1, hint: "Грецькі на -ee"},
+        {word: "thema", article: "het", translation: "тема", level: 1, hint: "Грецькі на -ma"},
+        {word: "nummer", article: "het", translation: "номер", level: 1, hint: "Слова на -mer"},
+        {word: "adres", article: "het", translation: "адреса", level: 1, hint: "⚠️ Французьке, але het"},
+        {word: "plan", article: "het", translation: "план", level: 1, hint: "Короткі слова на приголосний часто het"},
+        {word: "feit", article: "het", translation: "факт", level: 1, hint: "Слова на -feit"},
+        {word: "onderwerp", article: "het", translation: "тема, підмет", level: 1, hint: "Складне слово, але het"},
+        {word: "document", article: "het", translation: "документ", level: 1, hint: "Латинські на -ment"},
+        {word: "voorbeeld", article: "het", translation: "приклад", level: 1, hint: "Слова на -beeld"},
+        {word: "deel", article: "het", translation: "частина", level: 1, hint: "Коротке слово"},
+        {word: "niveau", article: "het", translation: "рівень", level: 1, hint: "Французькі на -eau"},
+        {word: "schema", article: "het", translation: "схема", level: 1, hint: "Грецькі на -ma"},
+        {word: "ding", article: "het", translation: "річ", level: 1, hint: "⚠️ Виняток: коротке слово"},
+        {word: "gebouw", article: "het", translation: "будівля", level: 1, hint: "Слова на -ouw"},
+        {word: "licht", article: "het", translation: "світло", level: 1, hint: "Короткі слова на -cht"},
+        {word: "cijfer", article: "het", translation: "цифра", level: 1, hint: "Слова на -fer"},
+        {word: "blad", article: "het", translation: "листя", level: 2, hint: "⚠️ АЛЕ: de blad = журнал/листок"},
+        {word: "dier", article: "het", translation: "тварина", level: 2, hint: "Коротке слово на -ier"},
+        {word: "schilderij", article: "het", translation: "картина", level: 2, hint: "⚠️ Виняток: -ij зазвичай de, але це het"},
+        {word: "avontuur", article: "het", translation: "пригода", level: 2, hint: "Слова на -uur (крім часу)"},
+        {word: "huishouden", article: "het", translation: "домогосподарство", level: 2, hint: "Складне слово"},
+        {word: "fenomeen", article: "het", translation: "явище", level: 2, hint: "Грецькі на -meen"},
+        {word: "publiek", article: "het", translation: "публіка", level: 2, hint: "Слова на -iek"},
+        {word: "fragment", article: "het", translation: "фрагмент", level: 2, hint: "Латинські на -ment"},
+        {word: "platteland", article: "het", translation: "сільська місцевість", level: 2, hint: "Складне слово"},
+        {word: "personage", article: "het", translation: "персонаж", level: 2, hint: "⚠️ Французьке -age, але het"},
+        {word: "dialect", article: "het", translation: "діалект", level: 2, hint: "Грецькі на -ect"},
+        {word: "gevolg", article: "het", translation: "наслідок", level: 2, hint: "Слова на -volg"},
+        {word: "hoofdstuk", article: "het", translation: "розділ", level: 2, hint: "Складне слово"},
+        {word: "meisje", article: "het", translation: "дівчинка", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "jongetje", article: "het", translation: "хлопчик", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "kindje", article: "het", translation: "дитинка", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "mannetje", article: "het", translation: "чоловічок", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "vrouwtje", article: "het", translation: "жіночка", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "huisje", article: "het", translation: "будиночок", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "boekje", article: "het", translation: "книжечка", level: 3, hint: "💡 Зменшувальне -je → ЗАВЖДИ het"},
+        {word: "ei", article: "het", translation: "яйце", level: 3, hint: "⚠️ Виняток: коротке слово"},
+        {word: "paard", article: "het", translation: "кінь", level: 3, hint: "Тварини часто het"},
+        {word: "schaap", article: "het", translation: "вівця", level: 3, hint: "Тварини часто het"},
+        {word: "varken", article: "het", translation: "свиня", level: 3, hint: "Слова на -ken (зменшувальне)"},
+        {word: "kalf", article: "het", translation: "теля", level: 3, hint: "Молода тварина"},
+        {word: "lam", article: "het", translation: "ягня", level: 3, hint: "Молода тварина"},
+        {word: "vee", article: "het", translation: "худоба", level: 3, hint: "Невідмінюване"},
+        {word: "gedrag", article: "het", translation: "поведінка", level: 3, hint: "Слова на -drag"},
+        {word: "weer", article: "het", translation: "погода", level: 3, hint: "⚠️ Виняток: коротке слово"},
+        {word: "verkeer", article: "het", translation: "рух, транспорт", level: 3, hint: "Слова на -keer"},
+        {word: "geld", article: "het", translation: "гроші", level: 3, hint: "⚠️ Виняток: коротке слово"},
+        {word: "brood", article: "het", translation: "хліб", level: 3, hint: "Їжа часто het"},
+        {word: "water", article: "het", translation: "вода", level: 3, hint: "Рідини часто het"},
+        {word: "vuur", article: "het", translation: "вогонь", level: 3, hint: "Стихії часто het"},
+        {word: "woord", article: "het", translation: "слово", level: 3, hint: "Слова на -woord"},
+        {word: "boek", article: "het", translation: "книга", level: 3, hint: "⚠️ Виняток: коротке слово"},
+        {word: "huis", article: "het", translation: "будинок", level: 3, hint: "⚠️ Виняток: коротке слово"},
+        {word: "jaar", article: "het", translation: "рік", level: 3, hint: "Часові одиниці"},
+        {word: "uur", article: "het", translation: "година", level: 3, hint: "Час"},
+        {word: "minuut", article: "de", translation: "хвилина", level: 3, hint: "⚠️ Виняток від 'uur'"},
+        {word: "uurwerk", article: "het", translation: "годинник", level: 3, hint: "Складне слово з 'uur'"},
+        {word: "werk", article: "het", translation: "робота", level: 3, hint: "Абстрактне поняття"},
+        {word: "bedrijf", article: "het", translation: "компанія", level: 3, hint: "Слова на -rijf"},
+        {word: "overheid", article: "de", translation: "уряд", level: 3, hint: "💡 Слова на -heid ЗАВЖДИ de"},
+        {word: "mogelijkheid", article: "de", translation: "можливість", level: 3, hint: "💡 Слова на -heid ЗАВЖДИ de"},
+        {word: "universiteit", article: "de", translation: "університет", level: 3, hint: "💡 Слова на -iteit ЗАВЖДИ de"},
+        {word: "natie", article: "de", translation: "нація", level: 3, hint: "💡 Слова на -tie ЗАВЖДИ de"},
+        {word: "economie", article: "de", translation: "економіка", level: 3, hint: "💡 Слова на -ie ЗАВЖДИ de"},
+        {word: "psychologie", article: "de", translation: "психологія", level: 3, hint: "💡 Слова на -ie ЗАВЖДИ de"}
+    ];
+
+    let currentLevel = 'all';
+    let currentWords = [];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let maxStreak = 0;
+    let answered = false;
+    let gameStats = { correct: 0, total: 0, byLevel: {1:{correct:0,total:0},2:{correct:0,total:0},3:{correct:0,total:0}} };
+
+    document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentLevel = this.dataset.level;
+        });
+    });
+
+    function startGame() {
+        if (currentLevel === 'all') {
+            currentWords = [...words].sort(() => Math.random() - 0.5);
+        } else {
+            currentWords = words.filter(w => w.level == currentLevel).sort(() => Math.random() - 0.5);
+        }
+        if (currentWords.length === 0) { alert('Немає слів для цього рівня!'); return; }
+        currentIndex = 0; score = 0; streak = 0;
+        gameStats = { correct: 0, total: 0, byLevel: {1:{correct:0,total:0},2:{correct:0,total:0},3:{correct:0,total:0}} };
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('game-area').classList.remove('hidden');
+        document.getElementById('controls').style.display = 'flex';
+        updateStats(); showWord();
+    }
+
+    function showWord() {
+        if (currentIndex >= currentWords.length) { endGame(); return; }
+        const word = currentWords[currentIndex];
+        document.getElementById('current-word').textContent = word.word;
+        document.getElementById('translation').textContent = word.translation;
+        document.getElementById('level-badge').textContent = 'Рівень ' + word.level;
+        document.getElementById('hint-text').textContent = word.hint;
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('feedback').className = 'feedback';
+        document.getElementById('hint-box').classList.remove('show');
+        document.getElementById('btn-de').disabled = false;
+        document.getElementById('btn-het').disabled = false;
+        answered = false;
+        updateProgress();
+    }
+
+    function checkAnswer(answer) {
+        if (answered) return;
+        answered = true;
+        const word = currentWords[currentIndex];
+        const correct = answer === word.article;
+        document.getElementById('btn-de').disabled = true;
+        document.getElementById('btn-het').disabled = true;
+        gameStats.total++; gameStats.byLevel[word.level].total++;
+        if (correct) {
+            score += 10 + (streak * 2); streak++;
+            if (streak > maxStreak) maxStreak = streak;
+            gameStats.correct++; gameStats.byLevel[word.level].correct++;
+            showFeedback(true, `✅ Правильно! ${word.article} ${word.word}`);
+        } else {
+            streak = 0;
+            showFeedback(false, `❌ Неправильно! Правильна відповідь: ${word.article} ${word.word}`);
+        }
+        updateStats();
+        setTimeout(() => { currentIndex++; showWord(); }, 2000);
+    }
+
+    function showFeedback(isCorrect, message) {
+        const feedback = document.getElementById('feedback');
+        feedback.textContent = message;
+        feedback.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+        feedback.style.display = 'block';
+    }
+
+    function showHint() {
+        document.getElementById('hint-box').classList.add('show');
+        score = Math.max(0, score - 2);
+        updateStats();
+    }
+
+    function skipQuestion() {
+        if (answered) return;
+        streak = 0;
+        const word = currentWords[currentIndex];
+        showFeedback(false, `⏭ Пропущено: ${word.article} ${word.word}`);
+        gameStats.total++; gameStats.byLevel[word.level].total++;
+        answered = true;
+        updateStats();
+        setTimeout(() => { currentIndex++; showWord(); }, 2000);
+    }
+
+    function updateStats() {
+        document.getElementById('score').textContent = score;
+        document.getElementById('question-num').textContent = Math.min(currentIndex + 1, currentWords.length);
+        document.getElementById('streak-count').textContent = streak;
+        const accuracy = gameStats.total > 0 ? Math.round((gameStats.correct / gameStats.total) * 100) : 0;
+        document.getElementById('accuracy').textContent = accuracy + '%';
+    }
+
+    function updateProgress() {
+        const progress = ((currentIndex) / currentWords.length) * 100;
+        document.getElementById('progress').style.width = progress + '%';
+    }
+
+    function endGame() {
+        document.getElementById('game-area').classList.add('hidden');
+        document.getElementById('controls').style.display = 'none';
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('final-score').textContent = score;
+        document.getElementById('total-questions').textContent = gameStats.total;
+        const accuracy = gameStats.total > 0 ? Math.round((gameStats.correct / gameStats.total) * 100) : 0;
+        document.getElementById('final-accuracy').textContent = accuracy + '%';
+        let message = '';
+        if (accuracy >= 90) message = '🏆 Відмінно! Ти експерт з артиклів!';
+        else if (accuracy >= 70) message = '👍 Добре! Але ще є над чим працювати.';
+        else if (accuracy >= 50) message = '📚 Непогано! Продовжуй вчитися.';
+        else message = '💪 Не здавайся! Практика робить майстра.';
+        if (maxStreak >= 10) message += '<br>🔥 Найдовша серія: ' + maxStreak + '!';
+        document.getElementById('performance-message').innerHTML = message;
+    }
+
+    function restartGame() {
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (document.getElementById('game-area').classList.contains('hidden')) return;
+        if (e.key === 'd' || e.key === 'D') checkAnswer('de');
+        if (e.key === 'h' || e.key === 'H') checkAnswer('het');
+        if (e.key === 'ArrowRight') skipQuestion();
+        if (e.key === '?') showHint();
+    });
+</script>
+</body>
+</html>
